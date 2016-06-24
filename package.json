@@ -1,0 +1,15 @@
+{
+  "name": "idcapp-videoserver",
+  "version": "1.0.0",
+  "description": "IDC Video streaming server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Capita IDC Terence",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^1.1.0"
+  }
+}
