@@ -39,6 +39,11 @@ socketServer.broadcast = function(data, opts) {
 	}
 };
 
+// default GET API
+app.get('/', function (req, res) {
+  res.send('IDC video server is up...');
+});
+
 // Streaming API to accept incoming stream
 app.use("/video", function (req, res) {
 	res.connection.setTimeout(0);
