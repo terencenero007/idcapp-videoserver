@@ -15,13 +15,12 @@ var socketServer = new SocketServer({ server });
 
 // Initialize connection from socket client	
 socketServer.on('connection', (socket) => {
-  	// Send magic bytes and video size to the newly connected socket
-	// struct { char magic[4]; unsigned short width, height;}
-	
-	var STREAM_MAGIC_BYTES = 'jsmp', // Must be 4 bytes
+  	var STREAM_MAGIC_BYTES = 'jsmp', // Must be 4 bytes
 		width = 320,
 		height = 240;
 	
+	// Send magic bytes and video size to the newly connected socket
+	// struct { char magic[4]; unsigned short width, height;}
 	var streamHeader = new Buffer(8);
 	streamHeader.write(STREAM_MAGIC_BYTES);
 	streamHeader.writeUInt16BE(width, 4);
