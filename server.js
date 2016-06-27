@@ -47,6 +47,9 @@ socketServer.broadcast = function(data, opts) {
 	}
 };
 
+// Set root directory for the static files
+app.use(express.static(__dirname + "/"))
+
 // default GET API
 app.get('/', function (req, res) {
   res.send('IDC video server is up...');
