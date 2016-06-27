@@ -1,23 +1,27 @@
-var server = require('http').createServer(), 
-	url = require('url'),
-	WebSocketServer = require('ws').Server,
-	socketServer = new WebSocketServer({ server: server }),
-	express = require('express'),
-	app = express();
+// Load express and websocket modules
+var express = require('express'),
+	SocketServer = require('ws').Server;
 
-var STREAM_MAGIC_BYTES = 'jsmp', // Must be 4 bytes
-	width = 320,
-	height = 240;
+// Initialize port from environment
+// Let 3000 by default
+var PORT = process.env.PORT || 3000;
 
-// Load configuration
-var nconf = require('nconf');
-nconf.env()
-	.file({ file:'config.json' });
-  
-// Client connecting to the socket
-socketServer.on('connection', function(socket) {
-	// Send magic bytes and video size to the newly connected socket
+// Initialize express on given port
+var app = express();
+	server = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
+
+// Initialize web socket
+var socketServer = new SocketServer({ server });
+
+// Initialize connection from socket client	
+socketServer.on('connection', (socket) => {
+  	// Send magic bytes and video size to the newly connected socket
 	// struct { char magic[4]; unsigned short width, height;}
+	
+	var STREAM_MAGIC_BYTES = 'jsmp', // Must be 4 bytes
+		width = 320,
+		height = 240;
+	
 	var streamHeader = new Buffer(8);
 	streamHeader.write(STREAM_MAGIC_BYTES);
 	streamHeader.writeUInt16BE(width, 4);
@@ -26,7 +30,7 @@ socketServer.on('connection', function(socket) {
 
 	console.log('New socket connection ('+socketServer.clients.length+' total)');
 	
-	socket.on('close', function(code, message){
+  	socket.on('close', function(code, message){
 		console.log('Disconnected socket ('+socketServer.clients.length+' total)');
 	});
 });
@@ -63,7 +67,3 @@ app.use("/video", function (req, res) {
 		socketServer.broadcast(data, {binary:true});
 	});
 });
-
-// Initialize server on given port
-server.on('request', app);
-server.listen(nconf.get('PORT'), function () { console.log('Server started on ' + server.address().port) });
