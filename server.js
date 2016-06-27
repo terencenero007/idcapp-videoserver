@@ -29,6 +29,7 @@ socketServer.on('connection', (socket) => {
 
 	console.log('New socket connection ('+socketServer.clients.length+' total)');
 	
+	// Client is closing
   	socket.on('close', function(code, message){
 		console.log('Disconnected socket ('+socketServer.clients.length+' total)');
 	});
