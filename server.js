@@ -7,9 +7,13 @@ var server = require('http').createServer(),
 
 var STREAM_MAGIC_BYTES = 'jsmp', // Must be 4 bytes
 	width = 320,
-	height = 240,
-	port = 3000;
-	
+	height = 240;
+
+// Load configuration
+var nconf = require('nconf');
+nconf.env()
+	.file({ file:'config.json' });
+  
 // Client connecting to the socket
 socketServer.on('connection', function(socket) {
 	// Send magic bytes and video size to the newly connected socket
@@ -62,4 +66,4 @@ app.use("/video", function (req, res) {
 
 // Initialize server on given port
 server.on('request', app);
-server.listen(port, function () { console.log('Server started on ' + server.address().port) });
+server.listen(nconf.get('PORT'), function () { console.log('Server started on ' + server.address().port) });
