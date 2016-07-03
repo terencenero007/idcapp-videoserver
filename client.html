@@ -1,41 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta name="viewport" content="width=320, initial-scale=1"/>
-	<title>jsmpeg streaming</title>
-	<style type="text/css">
-		body {
-			background: #333;
-			text-align: center;
-			margin-top: 10%;
-		}
-		#videoCanvas {
-			/* Always stretch the canvas to 640x480, regardless of its
-			internal size. */
-			width: 640px;
-			height: 480px;
-		}
-	</style>
-</head>
+
 <body>
-  <!-- The Canvas size specified here is the "initial" internal resolution. jsmpeg will
-		change this internal resolution to whatever the source provides. The size the
-		canvas is displayed on the website is dictated by the CSS style.
-	-->
-	<canvas id="videoCanvas" width="320" height="240">
-		<p>
-			Please use a browser that supports the Canvas Element, like
-			<a href="http://www.google.com/chrome">Chrome</a>,
-			<a href="http://www.mozilla.com/firefox/">Firefox</a>,
-			<a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
-		</p>
-	</canvas>
-	<script type="text/javascript" src="jsmpg.js"></script>
-	<script type="text/javascript">
-		var host = location.origin.replace(/^http/, 'ws');
-	    var client = new WebSocket(host);
-    	var canvas = document.getElementById('videoCanvas');
-		var player = new jsmpeg(client, {canvas:canvas});
-	</script>
+  <video width="320" height="240" controls autoplay>
+  </video>
+  <script>
+    
+    // Check the media source support in browser
+    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+		if (!!!window.MediaSource) {
+		  alert('MediaSource API is not available');
+		}
+    
+    // Initialize MediaSource and attach to video element
+		var ms = new MediaSource();
+		var video = document.querySelector('video');
+		video.src = window.URL.createObjectURL(ms);
+		var sourceBuffer;
+    var queue = [];
+    var firstTime = true;
+		
+    // Add listners to mediasource buffer
+		ms.addEventListener('sourceopen', function(e) {
+			//sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
+      sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vp8"');
+      sourceBuffer.addEventListener('updateend', processQueue);
+		});
+		
+    // Open the socket
+    // wss://idcapp-videoserver.herokuapp.com/video/
+    var host = location.origin.replace(/^http/, 'ws');
+	  var ws = new WebSocket(host);
+    //var ws = new WebSocket("ws://localhost:3000");
+		ws.binaryType = 'arraybuffer';				
+	
+    // Message event handler for the socket      
+		ws.onmessage = function (evt) {
+        var data = evt.data;
+        
+		    if (firstTime) {
+          firstTime = false;
+          sourceBuffer.appendBuffer(new Uint8Array(data));
+          if (video.paused) {
+              video.play(); 
+          }
+        }
+        else {
+          queue.push(data);
+          processQueue();
+        }
+    };
+    
+    // Add first element of the queue to the media buffer
+    function processQueue() {
+      if (sourceBuffer.updating) {
+        return;
+      }
+      
+      if (queue.length == 0){
+        return;
+      }
+      
+      var data = queue.shift(); 
+      sourceBuffer.appendBuffer(new Uint8Array(data));
+    };
+		
+    // Error handler
+		function onError(e) {
+			console.log("Error: "+e);
+		};
+		
+    // Socket close notification
+		ws.onclose = function(){ 
+          console.log("Connection is closed..."); 
+    };
+    
+  </script>
 </body>
+
 </html>
