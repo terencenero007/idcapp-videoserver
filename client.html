@@ -22,8 +22,7 @@
 		
     // Add listners to mediasource buffer
 		ms.addEventListener('sourceopen', function(e) {
-			//sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
-      sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vp8"');
+			sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
       sourceBuffer.addEventListener('updateend', processQueue);
 		});
 		
