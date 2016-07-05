@@ -44,6 +44,19 @@ app.get('/', function (req, res) {
 });
 
 // Streaming API to accept incoming stream
+/*app.post("/video", function (req, res) {
+	console.log('Stream connected: ' +  req.socket.remoteAddress + ':' +  req.socket.remotePort);
+		
+	// Pass the icoming data to the socket
+	req.on('data', function(data){
+		console.log(data);
+		socketServer.broadcast(data, {binary:true});
+	});
+	
+	res.sendStatus(200);
+});*/
+
+// Streaming API to accept incoming stream
 app.use("/video", function (req, res) {
 	res.connection.setTimeout(0);
 	
@@ -55,6 +68,8 @@ app.use("/video", function (req, res) {
 		
 	// Pass the icoming data to the socket
 	req.on('data', function(data){
+		console.log(data);
+		// console.log(data.type);
 		socketServer.broadcast(data, {binary:true});
 	});
 });

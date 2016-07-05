@@ -23,6 +23,7 @@
     // Add listners to mediasource buffer
 		ms.addEventListener('sourceopen', function(e) {
 			sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
+      // sourceBuffer = ms.addSourceBuffer('video/mp4; codecs="avc1.4D401E,mp4a.40.2"');
       sourceBuffer.addEventListener('updateend', processQueue);
 		});
 		
@@ -36,6 +37,7 @@
     // Message event handler for the socket      
 		ws.onmessage = function (evt) {
         var data = evt.data;
+        console.log(data);
         
 		    if (firstTime) {
           firstTime = false;
@@ -52,16 +54,11 @@
     
     // Add first element of the queue to the media buffer
     function processQueue() {
-      if (sourceBuffer.updating) {
+      if ((queue.length == 0) || (sourceBuffer.updating)) {
         return;
       }
       
-      if (queue.length == 0){
-        return;
-      }
-      
-      var data = queue.shift(); 
-      sourceBuffer.appendBuffer(new Uint8Array(data));
+      sourceBuffer.appendBuffer(new Uint8Array(queue.shift()));
     };
 		
     // Error handler
