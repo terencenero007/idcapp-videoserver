@@ -11,7 +11,7 @@ function initializeRecorder() {
         // Initialize recorder here
         console.log("Inside getUserMedia");
         var options = { mimeType: 'video/webm; codecs="vorbis,vp8"' };
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream, options);
         mediaRecorder.ondataavailable = onDataAvailable;
         console.log("Recorder initialized");
     }, function (e) {
