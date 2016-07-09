@@ -1,76 +1,69 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+  <meta charset="utf-8" />
+  <style type="text/css">
+    video {
+      display: block;
+      margin: 0 auto;
+      width: 640px;
+      height:480px;
+    }
+  </style>
+</head>
+
 <body>
-  <video width="320" height="240" controls autoplay>
-  </video>
+ <video controls></video>
   <script>
-    
-    // Check the media source support in browser
-    window.MediaSource = window.MediaSource || window.WebKitMediaSource;
-		if (!!!window.MediaSource) {
-		  alert('MediaSource API is not available');
-		}
-    
-    // Initialize MediaSource and attach to video element
-		var ms = new MediaSource();
-		var video = document.querySelector('video');
-		video.src = window.URL.createObjectURL(ms);
-		var sourceBuffer;
-    var queue = [];
-    var firstTime = true;
-		
-    // Add listners to mediasource buffer
-		ms.addEventListener('sourceopen', function(e) {
-			sourceBuffer = ms.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
-      // sourceBuffer = ms.addSourceBuffer('video/mp4; codecs="avc1.4D401E,mp4a.40.2"');
-      sourceBuffer.addEventListener('updateend', processQueue);
-		});
-		
-    // Open the socket
-    // wss://idcapp-videoserver.herokuapp.com/video/
-    var host = location.origin.replace(/^http/, 'ws');
-	  var ws = new WebSocket(host);
-    //var ws = new WebSocket("ws://localhost:3000");
-		ws.binaryType = 'arraybuffer';				
-	
-    // Message event handler for the socket      
-		ws.onmessage = function (evt) {
-        var data = evt.data;
-        console.log(data);
-        
-		    if (firstTime) {
-          firstTime = false;
-          sourceBuffer.appendBuffer(new Uint8Array(data));
-          if (video.paused) {
-              video.play(); 
-          }
-        }
-        else {
-          queue.push(data);
-          processQueue();
-        }
-    };
-    
-    // Add first element of the queue to the media buffer
-    function processQueue() {
-      if ((queue.length == 0) || (sourceBuffer.updating)) {
-        return;
+      var mimeType = 'video/webm; codecs="vorbis,vp8"';
+      var socketURL = location.origin.replace(/^http/, 'ws');
+      var mediaSourceBuffer;
+      var webSocket;
+      var bufferQueue = [];
+      
+      // Initialize media source and attach to video element
+      console.log("Initializing media source");
+      var mediaSource = new MediaSource();
+      var videoElement = document.querySelector('video');
+      videoElement.src = URL.createObjectURL(mediaSource);
+      mediaSource.addEventListener('sourceopen', mediaSourceOpen);
+      
+      // Notification event when the media source opens
+      // Initialize media buffer and websocket connection
+      function mediaSourceOpen() {
+        console.log("In the mediaSourceOpen");
+        mediaSourceBuffer = mediaSource.addSourceBuffer(mimeType);
+        mediaSourceBuffer.addEventListener('updateend', processQueue);
+
+        webSocket = new WebSocket(socketURL);
+        webSocket.binaryType = 'arraybuffer';
+        webSocket.onmessage = onSocketMessage; 
+        console.log("MediaSourceOpen completed");
+      }
+
+      // Notitifcation event when the socket receives data
+      // Add data to the queue for the processing
+      function onSocketMessage(event) {
+        bufferQueue.push(event.data);
+        processQueue();
       }
       
-      sourceBuffer.appendBuffer(new Uint8Array(queue.shift()));
-    };
-		
-    // Error handler
-		function onError(e) {
-			console.log("Error: "+e);
-		};
-		
-    // Socket close notification
-		ws.onclose = function(){ 
-          console.log("Connection is closed..."); 
-    };
-    
+      // Notification funtion to procees next data in the queue
+      // Take first video data from the queue and to the media buffer
+      // Dont add data if the media buffer is busy
+      function processQueue() {
+        if ((bufferQueue.length == 0) || (mediaSourceBuffer.updating)) {
+          return;
+        }
+
+        var data = bufferQueue.shift();
+        console.log(data);
+        mediaSourceBuffer.appendBuffer(new Uint8Array(data));
+         if (videoElement.paused) {
+            videoElement.play(); 
+        }
+      }
   </script>
 </body>
 
