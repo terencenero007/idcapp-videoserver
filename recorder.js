@@ -22,13 +22,13 @@ function initializeRecorder() {
 // Notification when the recording data available
 // Read the given blob and post to server using video API
 function onDataAvailable(e) {
-    console.log("In onDataAvailable " + e.data.size);
+    // console.log("In onDataAvailable " + e.data.size);
     if (e.data.size > 0) {
         var reader = new FileReader();
         reader.addEventListener("loadend", function () {
             if (reader.result.byteLength > 0) {
                 var data = reader.result;
-                console.log("Posting data " + data);
+                // console.log("Posting data " + data);
                 var url = location.origin + "/video";
                 var httpRequest = new XMLHttpRequest();
                 httpRequest.open("POST", url, true);

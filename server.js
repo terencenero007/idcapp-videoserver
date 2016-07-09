@@ -45,7 +45,7 @@ app.get('/', function (req, res) {
 
 // Streaming API to accept incoming video stream and broadcast to all the connected clients
 app.post("/video", function (req, res) {
-	console.log('Stream connected: ' + req.socket.remoteAddress + ':' + req.socket.remotePort);
+	// console.log('Stream connected: ' + req.socket.remoteAddress + ':' + req.socket.remotePort);
 
 	// Read stream from the incoming request
 	// Append each chunks while streaming
@@ -63,9 +63,9 @@ app.post("/video", function (req, res) {
 
 	// Broadcast data to the connected clients after reading the stream
 	req.on('end', function () {
-		console.log("Stream completed");
+		/*console.log("Stream completed");
 		console.log(dataBuffer.length);
-		console.log(dataBuffer);
+		console.log(dataBuffer);*/
 		socketServer.broadcast(dataBuffer, { binary: true });
 		res.sendStatus(200);
 	});
