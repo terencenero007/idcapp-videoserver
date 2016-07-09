@@ -63,9 +63,7 @@ app.post("/video", function (req, res) {
 
 	// Broadcast data to the connected clients after reading the stream
 	req.on('end', function () {
-		/*console.log("Stream completed");
-		console.log(dataBuffer.length);
-		console.log(dataBuffer);*/
+		console.log("Stream completed " + dataBuffer.length);
 		socketServer.broadcast(dataBuffer, { binary: true });
 		res.sendStatus(200);
 	});
