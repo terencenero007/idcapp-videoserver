@@ -1,7 +1,7 @@
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var constraints = { audio: true, video: { width: { min: 640, ideal: 640, max: 1280 }, height: { min: 480, ideal: 480, max: 720 } } };
 var mediaRecorder;
-var recordingFreequency = 100;
+var recordingFrequency = 10;
 
 // Initialize recoding settings by calling getUserMedia
 function initializeRecorder() {
@@ -42,7 +42,7 @@ function onDataAvailable(e) {
 // Start the media recording in given interval
 function startRecording() {
     console.log("Recording starting");
-    mediaRecorder.start(recordingFreequency);
+    mediaRecorder.start(recordingFrequency);
 };
 
 // Stop the media recording
