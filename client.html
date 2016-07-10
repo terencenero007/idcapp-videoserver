@@ -7,16 +7,28 @@
     video {
       display: block;
       margin: 0 auto;
+      top: 50%;
+      position: relative;
+      transform: translateY(-50%);
       width: 640px;
-      height:480px;
+      height: 480px;
+    }
+    
+    html,
+    body {
+      min-height: 100%;
+      height: 100%;
+      margin: 0;
+      background-color: #E0E0E0;
+      ;
     }
   </style>
 </head>
 
 <body>
- <video controls></video>
+  <video controls></video>
   <script>
-      var mimeType = 'video/webm; codecs="vorbis,vp8"';
+    var mimeType = 'video/webm; codecs="vorbis,vp8"';
       var socketURL = location.origin.replace(/^http/, 'ws');
       var mediaSourceBuffer;
       var webSocket;
