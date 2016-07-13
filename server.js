@@ -24,10 +24,10 @@ socketServer.on('connection', (socket) => {
 });
 
 // Broadcast the given data to all the connected clients
-socketServer.broadcast = function (data, opts) {
+socketServer.broadcast = function (data, options) {
 	for (var i in this.clients) {
 		if (this.clients[i].readyState == 1) {
-			this.clients[i].send(data, opts);
+			this.clients[i].send(data, options);
 		}
 		else {
 			console.log('Error: client (' + i + ') not connected');
@@ -44,13 +44,13 @@ app.get('/', function (req, res) {
 });
 
 // Streaming API to accept incoming video stream and broadcast to all the connected clients
-app.post("/video", function (req, res) {
-	// console.log('Stream connected: ' + req.socket.remoteAddress + ':' + req.socket.remotePort);
+app.post("/video", function (request, response) {
+	console.log('Stream connected: ' + request.socket.remoteAddress + ':' + request.socket.remotePort);
 
 	// Read stream from the incoming request
 	// Append each chunks while streaming
 	var dataBuffer = null, newBuffer, bufferLength;
-	req.on('data', function (data) {
+	request.on('data', function (data) {
 		if (dataBuffer == null) {
 			dataBuffer = data;
 		}
@@ -62,9 +62,9 @@ app.post("/video", function (req, res) {
 	});
 
 	// Broadcast data to the connected clients after reading the stream
-	req.on('end', function () {
+	request.on('end', function () {
 		console.log("Stream completed " + dataBuffer.length);
 		socketServer.broadcast(dataBuffer, { binary: true });
-		res.sendStatus(200);
+		response.sendStatus(200);
 	});
 });
