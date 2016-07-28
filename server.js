@@ -4,7 +4,7 @@ var express = require('express'),
 
 // Initialize the port from the environment variable
 // Let 3000 by default
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3001;
 
 // Initialize the server on the given port
 var app = express();
